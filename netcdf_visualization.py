@@ -1958,12 +1958,17 @@ class load():
 
 class shaedit():
     '''
+    Create an interactive plot to edit 2D variables (*args).
+    Input arguments (*args) are expected to be numpy.ndarray, netCDF4.Variable or ncGriddedVar instances.
+    If using numpy-arrays, to be able to retrieve the arrays after editing them, do:
+    `obj = shaedit(*args)`
+    The arrays will be stored in `obj.arrays`
     '''
 
     def __init__(self, *args, fig=None, ax=None, cax=None, cmap=None, clim=None, show=True):
         '''
-        Create an interactive plot to edit 2D variables (*args).
-        Arguments are expected to be numpy.ndarray or ncGriddedVar objects.
+        *args must be numpy.ndarray, netCDF4.Variable or ncGriddedVar instances.
+        Cf docstring of "shaedit" class.
         '''
 
         if len(args) == 0:
