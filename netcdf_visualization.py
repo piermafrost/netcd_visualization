@@ -2339,9 +2339,9 @@ class shaedit():
             if self.data_edit_props['how'] == 'absolute':
                 self.current_array.data[msk] = x
             elif self.data_edit_props['how'] == 'delta':
-                self.current_array.data[msk] += x
+                self.current_array.data[msk] = (self.current_array.data[msk] + x).astype(self.current_array.dtype)
             else: # -> self.data_edit_props['how'] == '%'
-                self.current_array.data[msk] *= (x/100)
+                self.current_array.data[msk] = ((x/100)*self.current_array.data[msk]).astype(self.current_array.dtype)
             #
             if np.size(self.current_array.mask) != 1:
                 self.current_array.mask[msk] = False
