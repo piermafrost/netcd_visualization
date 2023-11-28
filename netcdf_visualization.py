@@ -1622,12 +1622,12 @@ class ncGriddedVar(physical_array):
     # Method to create an interactive editing plot #
     # ============================================ #
 
-    def shaedit(self, fig=None, ax=None, cax=None, cmap=None, clim=None, show=True):
+    def shaedit(self, **kwargs):
         # Keep only non-degenerated dimensions
         dimid,_,_ = self._get_dimensions_order()
         tslc = tuple(slice(None) if k in dimid else 0 for k in range(self.ndim))
 
-        self._dummy_ = shaedit(self[tslc], fig=fig, ax=ax, cax=cax, cmap=cmap, clim=clim, show=show)
+        self._dummy_ = shaedit(self[tslc], **kwargs)
 
 
 
@@ -1935,9 +1935,9 @@ class load():
     # Method to create an interactive editing plot of all the variables contained #
     # =========================================================================== #
 
-    def shaedit(self, exclude=(), fig=None, ax=None, cax=None, cmap=None, clim=None, show=True):
+    def shaedit(self, exclude=(), **kwargs):
         self._dummy_ = shaedit(*(var for key,var in self.variables.items() if key not in self.dimensions and key not in exclude),
-                               fig=fig, ax=ax, cax=cax, cmap=cmap, clim=clim, show=show)
+                               **kwargs)
 
 
 
@@ -1965,7 +1965,7 @@ class shaedit():
     The arrays will be stored in `obj.arrays`
     '''
 
-    def __init__(self, *args, fig=None, ax=None, cax=None, cmap=None, clim=None, show=True):
+    def __init__(self, *args, fig=None, ax=None, cax=None, cmap=None, clim=None, show=True, invert_axis='none'):
         '''
         *args must be numpy.ndarray, netCDF4.Variable or ncGriddedVar instances.
         Cf docstring of "shaedit" class.
@@ -2023,6 +2023,12 @@ class shaedit():
                 fig = plt.figure(figsize=(15,10))
 
             ax = fig.add_axes([.20, .13, .86, .70])
+
+            if invert_axis in ('x', 'both'):
+                ax.invert_xaxis()
+
+            if invert_axis in ('y', 'both'):
+                ax.invert_yaxis()
 
         self.fig = fig
         self.ax  = ax
