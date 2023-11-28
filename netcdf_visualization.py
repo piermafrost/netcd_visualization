@@ -2073,19 +2073,23 @@ class shaedit():
         self.gui['LasSel'] = mp_wdgt.LassoSelector(self.ax, onselect=self._PolSel_Updte_)
         self.gui['LasSel'].set_active(False)
 
+        self.gui['ClkVal'] = mp_wdgt.Cursor(self.ax, linewidth=0)
+        self.gui['ClkVal'].connect_event('button_press_event', self._ClkVal_Updte_)
+        self.gui['ClkVal'].set_active(False)
+
 
         # Buttons activating selectors
         # ----------------------------
 
-        self.gui['selector'] = mp_wdgt.RadioButtons(self.fig.add_axes([0.02, 0.85, 0.12, 0.13]),
-                                                      ['rectangle selector', 'polygon selector', 'lasso selector'], active=0)
+        self.gui['selector'] = mp_wdgt.RadioButtons(self.fig.add_axes([0.02, 0.80, 0.12, 0.18]),
+                                                      ['rectangle selector', 'polygon selector', 'lasso selector', 'click on value'], active=0)
         self.gui['selector'].on_clicked(self._Swtch_Selector_)
 
-        self.gui['select/unselect'] = mp_wdgt.RadioButtons(self.fig.add_axes([0.02, 0.74, 0.08, 0.07]),
+        self.gui['select/unselect'] = mp_wdgt.RadioButtons(self.fig.add_axes([0.02, 0.69, 0.08, 0.07]),
                                                            ['select', 'unselect'], active=0)
         self.gui['select/unselect'].on_clicked(self._Swtch_SelUnsel_)
 
-        self.gui['clear select'] = mp_wdgt.Button(self.fig.add_axes([0.02, 0.65, 0.12, 0.05]),
+        self.gui['clear select'] = mp_wdgt.Button(self.fig.add_axes([0.02, 0.60, 0.12, 0.05]),
                                                   'clear selection')
         self.gui['clear select'].on_clicked(self._Clear_EditMask_)
 
@@ -2253,6 +2257,32 @@ class shaedit():
         plt.draw()
 
 
+    def _ClkVal_Updte_(self, event):
+        '''
+        Method to update editing mask from "click on value" selector
+        '''
+        if self.gui['ClkVal'].active: # for some obscure reason, "connect_event" stays active even if the cursor is inactive
+
+            if event.inaxes == self.ax:
+
+                i, j = int(event.ydata), int(event.xdata)
+                val = self.current_array[i,j]
+
+                if not np.ma.is_masked(val):
+
+                    msk = (self.current_array == val)
+
+                    if self.selecting:
+                        msk = np.logical_or(~self.editmask.mask, msk)
+                    else:
+                        msk = np.logical_and(~self.editmask.mask, ~msk)
+
+                    self.editmask = np.ma.masked_where(~msk, msk.astype('int8'))
+
+                    self.mpid.set_array(self.editmask)
+                    plt.draw()
+
+
     def _Swtch_Selector_(self, event):
         '''
         Method to switch selecting method ("selector")
@@ -2260,6 +2290,7 @@ class shaedit():
         self.gui['RecSel'].set_active(event=='rectangle selector')
         self.gui['PolSel'].set_active(event=='polygon selector')
         self.gui['LasSel'].set_active(event=='lasso selector')
+        self.gui['ClkVal'].set_active(event=='click on value')
         plt.draw()
 
 
