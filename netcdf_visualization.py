@@ -2604,11 +2604,20 @@ class shaedit():
         '''
         Save all data in corresponding file
         '''
-        for var, field in zip(self.variables, self.arrays):
-            var[:] = field
-            # assert that ncGriddedVar objects are properly written in files
-            if isinstance(var, ncGriddedVar):
-                if var._value is not None: # => var's data is detached from the file
-                    var.save_in_file()
+        for k, (var, field) in enumerate(zip(self.variables, self.arrays)):
+            try:
+                var[:] = field
+                # assert that ncGriddedVar objects are properly written in files
+                if isinstance(var, ncGriddedVar):
+                    if var._value is not None: # => var's data is detached from the file
+                        var.save_in_file()
+
+            except RuntimeError as err:
+                if hasattr(var, 'name'):
+                    print('Could not save varaible "{:}"'.format(var.name))
+                else:
+                    print('Could not save varaible #{:}'.format(k))
+
+                print(err)
 
 
