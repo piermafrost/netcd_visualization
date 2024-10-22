@@ -598,17 +598,12 @@ class ncGriddedVar(physical_array):
     # Method to create dimensions attribute, used in __init__
     def _create_dimensions_attribute(self, dimensions=None):
 
-        if self._nc4_dataset is None or self._nc4_parent is None: # If orphan variable => simply use the given dimensions tuple
+        if self.dataset is not None: # --> variable was created within a "load" object
+            #
+            self.dimensions = tuple(self.dataset.dimensions[name] for name in self._nc4_parent.dimensions)
 
-            if dimensions is None:
-                self.dimensions = ()
-            elif type(dimensions) is dict:
-                self.dimensions = tuple(dim for _,dim in dimensions.items())
-            else:
-                self.dimensions = tuple(dimensions)
-
-        else: # If variables derives from a netCDF4 Dataset:
-
+        elif (self._nc4_dataset is not None) and (self._nc4_parent is not None): # --> variable derives from a netCDF4 Dataset:
+            #
             if dimensions is None:
                 # If no dimension tuple given => create it (invoke 'ncDimension' class)
                 self.dimensions =  tuple(ncDimension(dim, self._nc4_dataset) for dim in self._nc4_parent.dimensions)
@@ -616,6 +611,15 @@ class ncGriddedVar(physical_array):
                 # Otherwise, a dictionary of 'ncDimension' object is expected (at least, of objects having the attribute 'name').
                 # => Select the dimensions netCDF4 variable is defined on
                 self.dimensions = tuple(dimensions[name] for name in self._nc4_parent.dimensions)
+
+        else: # If orphan variable => simply use the given dimensions tuple
+            #
+            if dimensions is None:
+                self.dimensions = ()
+            elif type(dimensions) is dict:
+                self.dimensions = tuple(dim for _,dim in dimensions.items())
+            else:
+                self.dimensions = tuple(dimensions)
 
         self.ndim = len(self.dimensions)
 
