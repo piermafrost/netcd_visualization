@@ -156,7 +156,7 @@ class physical_array():
 
 
 ################################################################
-##  MAIN CLASSES  ('ncDImenison', 'ncGriddedVar' and 'load')  ##
+##  MAIN CLASSES  ('ncDimension', 'ncGriddedVar' and 'load')  ##
 ################################################################
 
 
@@ -169,7 +169,7 @@ class ncDimension(physical_array):
 
         self._nc4_dataset     = from_netCDF4_Dataset
         self.name             = name
-        # Note: those attribute will be overridden if dimension is from a netCDF dataset
+        # Note: these attributes will be overridden if dimension is from a netCDF dataset
         self.positions        = positions
         self.bounds           = bounds
         self.bounds_1D        = bounds_1D
@@ -343,7 +343,7 @@ class ncGriddedVar(physical_array):
         '''
         3 options to create a new ncGriddedVar
           * from a "load" object dataset
-            => "dataset" kwarg is provided. Ths only information needed is "name".
+            => "dataset" kwarg is provided. The only information needed is "name".
           * duplicate from another ncGriddedVar
             => "replicate_var" kwarg is provided. All other information is optional, and is meant
                to modify the duplicated variable (change its name, units, ...)
@@ -1640,7 +1640,7 @@ class load():
         if mode in ('r', 'r+'):
             pass
         elif mode == 'w':
-            raise ValueError('Illegal mode=="r". Cannot create new dataset with "load"')
+            raise ValueError('Illegal mode "w". Cannot create new dataset with "load"')
         else:
             raise ValueError('Illegal value "{:}" for "mode"'.format(mode))
 
